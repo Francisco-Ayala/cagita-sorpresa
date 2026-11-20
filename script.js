@@ -97,6 +97,7 @@ const lb = new THREE.Mesh(new THREE.BoxGeometry(.32,.3,.1), new THREE.MeshStanda
 const sh = new THREE.Mesh(new THREE.TorusGeometry(.1,.025,8,20,Math.PI), new THREE.MeshStandardMaterial({color:0xbdbdbd,metalness:.9,roughness:.25})); sh.position.y=.15; lock.add(sh);
 const lh = new THREE.Mesh(new THREE.CylinderGeometry(.07,.07,.04,16), new THREE.MeshStandardMaterial({color:0xffe14d,emissive:0x664400})); lh.rotation.x=Math.PI/2; lh.position.z=.06; lock.add(lh);
 lock.userData.hit = true;
+lock.scale.setScalar(1.6);
 const lockHit = new THREE.Mesh(new THREE.SphereGeometry(.6,8,8), new THREE.MeshBasicMaterial({visible:false})); lock.add(lockHit);
 
 /* ====== Ramo de flores ====== */
@@ -228,8 +229,7 @@ cv.addEventListener('pointerup',e=>{
   state.drag=false;
   if(state.moved>6)return;
   mouse.set(e.clientX/W()*2-1,-(e.clientY/H())*2+1); ray.setFromCamera(mouse,camera);
-  if(!state.open){ if(ray.intersectObject(lockHit).length) openBox(); }
-  else if(ray.intersectObject(card).length) openLetter();
+  if(!state.open){ if(ray.intersectObject(box,true).length) openBox(); }  else if(ray.intersectObject(card).length) openLetter();
 });
 
 /* tweens */
@@ -240,7 +240,7 @@ function tween(dur,delay,fn,ez=ease.out,done){tweens.push({dur,delay,fn,ez,done,
 function openBox(){
   state.open=true;
   document.getElementById('hint').style.opacity=0;
-  tween(.6,0,k=>{lock.scale.setScalar(1-k);lock.position.y=1.15+k*.5;lock.rotation.z=k*1.5;},ease.out,()=>lock.visible=false);
+  tween(.6,0,k=>{lock.scale.setScalar(1.6*(1-k));lock.position.y=1.15+k*.5;lock.rotation.z=k*1.5;},ease.out,()=>lock.visible=false);
   tween(1.6,.4,k=>{lidPivot.rotation.x=-1.95*k;},ease.back);
   sparks.visible=true; pl.intensity=2.6;
   hearts.forEach(h=>{setTimeout(()=>respawn(h),600+h.delay*700);});
