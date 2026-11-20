@@ -1,0 +1,20 @@
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;overflow:hidden;background:radial-gradient(ellipse at 50% 40%,#4a0a22 0%,#1c0510 55%,#09050a 100%);font-family:'Cormorant Garamond',serif;user-select:none;touch-action:none}
+canvas{display:block;position:fixed;inset:0}
+#title{position:fixed;top:7%;left:0;right:0;text-align:center;font-family:'Cinzel',serif;font-size:clamp(1.3rem,6vw,2.6rem);letter-spacing:.18em;background:linear-gradient(180deg,#fff5d6,#d4af37 60%,#8a6a14);-webkit-background-clip:text;background-clip:text;color:transparent;opacity:0;transform:translateY(-12px);transition:opacity 1.6s,transform 1.6s;pointer-events:none;text-shadow:0 0 30px rgba(212,175,55,.25)}
+#title.on{opacity:1;transform:none}
+#hint{position:fixed;bottom:6%;left:0;right:0;text-align:center;color:#ffd9e2;font-size:1.15rem;letter-spacing:.12em;opacity:.9;animation:pulse 2s ease-in-out infinite;pointer-events:none;transition:opacity .6s}
+@keyframes pulse{50%{opacity:.35}}
+#letter{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(9,5,10,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;visibility:hidden;transition:opacity .6s,visibility .6s;z-index:10;padding:16px}
+#letter.on{opacity:1;visibility:visible}
+.paper{position:relative;width:min(92vw,520px);min-height:360px;padding:64px 28px 28px;background:radial-gradient(circle at 50% 30%,#fffdf6,#fff5e9 70%,#f2dec8);border-radius:10px;border:1px solid #e9c9a8;box-shadow:0 20px 60px rgba(0,0,0,.6),inset 0 0 40px rgba(212,175,55,.15);text-align:center;transform:scale(.85) translateY(20px);transition:transform .6s cubic-bezier(.2,1.2,.3,1)}
+#letter.on .paper{transform:none}
+.seal{position:absolute;top:-24px;left:50%;transform:translateX(-50%);width:56px;height:56px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#e0243f,#8c0b22);box-shadow:0 6px 14px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center}
+.seal svg{width:26px;height:26px;fill:#f7e29c}
+.to{font-family:'Great Vibes',cursive;font-size:2rem;color:#00b6e8;margin-bottom:6px}
+.div{height:1px;width:40%;margin:8px auto 18px;background:linear-gradient(90deg,transparent,#dc143c,transparent)}
+#body{font-size:1.3rem;line-height:1.7;color:#2b1a1a;white-space:pre-line;min-height:200px}
+#body.typing::after{content:'|';animation:pulse .8s infinite}
+.foot{margin-top:18px;padding-top:10px;border-top:1px solid rgba(212,175,55,.3);font-family:'Great Vibes',cursive;font-size:1.3rem;color:#00b6e8;opacity:0;transition:opacity 1s}
+.foot.on{opacity:1}
+#close{position:absolute;top:10px;right:12px;width:32px;height:32px;border-radius:50%;border:1px solid #e9c9a8;background:#fff;color:#00b6e8;font-size:16px;cursor:pointer}
