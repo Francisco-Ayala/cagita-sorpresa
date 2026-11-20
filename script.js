@@ -102,17 +102,32 @@ const lockHit = new THREE.Mesh(new THREE.SphereGeometry(.6,8,8), new THREE.MeshB
 
 /* ====== Ramo de flores ====== */
 const bouquet = new THREE.Group(); bouquet.position.set(0,.9,0); bouquet.scale.setScalar(.01); bouquet.visible=false; box.add(bouquet);
-const petalGeo = new THREE.SphereGeometry(1,10,6); petalGeo.scale(.27,.035,.1); petalGeo.translate(.27,0,0);
+const petalGeo = new THREE.SphereGeometry(1,14,8); petalGeo.scale(.4,.03,.095); petalGeo.translate(.4,0,0);
 function flower(color){
   const g=new THREE.Group();
-  const mat=new THREE.MeshStandardMaterial({color,roughness:.45,side:THREE.DoubleSide,emissive:0x330008});
-  [[10,.25,1],[9,.6,.82],[7,1.0,.62]].forEach(([n,tilt,sc],L)=>{
-    for(let i=0;i<n;i++){
-      const pv=new THREE.Group(); pv.rotation.y=i/n*Math.PI*2+L*.35;
-      const p=new THREE.Mesh(petalGeo,mat); p.rotation.z=tilt; p.scale.setScalar(sc); pv.add(p); g.add(pv);
-    }
-  });
-  const c=new THREE.Mesh(new THREE.SphereGeometry(.07,10,8),new THREE.MeshStandardMaterial({color:0xffd24d,emissive:0x664400})); c.position.y=.05; g.add(c);
+  const base=new THREE.Color(color);
+  const outer=new THREE.MeshStandardMaterial({color:base,roughness:.4,side:THREE.DoubleSide,emissive:0x0a2450});
+  const inner=new THREE.MeshStandardMaterial({color:base.clone().lerp(new THREE.Color(0xffffff),.45),roughness:.4,side:THREE.DoubleSide,emissive:0x0a2450});
+  /* 3 pétalos exteriores + 3 interiores = lirio de 6 pétalos */
+  for(let i=0;i<3;i++){
+    const pv=new THREE.Group(); pv.rotation.y=i/3*Math.PI*2;
+    const p=new THREE.Mesh(petalGeo,outer); p.rotation.z=.45; pv.add(p); g.add(pv);
+  }
+  for(let i=0;i<3;i++){
+    const pv=new THREE.Group(); pv.rotation.y=i/3*Math.PI*2+Math.PI/3;
+    const p=new THREE.Mesh(petalGeo,inner); p.rotation.z=.75; p.scale.setScalar(.92); pv.add(p); g.add(pv);
+  }
+  /* estambres dorados */
+  const stamenGeo=new THREE.CylinderGeometry(.01,.01,.32,5); stamenGeo.translate(0,.16,0);
+  const tipGeo=new THREE.SphereGeometry(.035,8,6);
+  const gold=new THREE.MeshStandardMaterial({color:0xffc94d,emissive:0x664400});
+  const green=new THREE.MeshStandardMaterial({color:0xe8f6d8});
+  for(let i=0;i<6;i++){
+    const pv=new THREE.Group(); pv.rotation.y=i/6*Math.PI*2;
+    const st=new THREE.Mesh(stamenGeo,green); st.rotation.z=-.35; pv.add(st);
+    const tip=new THREE.Mesh(tipGeo,gold); tip.position.set(Math.sin(.35)*.32,Math.cos(.35)*.32,0); pv.add(tip);
+    g.add(pv);
+  }
   return g;
 }
 function stem(a,b,r,mat){
@@ -127,10 +142,10 @@ for(let i=0;i<NF;i++){
   const phi=i*2.4, rr=Math.sqrt(i/NF)*.95;
   const tp=new THREE.Vector3(Math.cos(phi)*rr,1.55+(1-(rr/.95)*(rr/.95))*.4,Math.sin(phi)*rr);
   bouquet.add(stem(new THREE.Vector3(0,0,0),tp,.03,M.green));
-  const f=flower(i%5==0?0xff5a6e:0xff2d3f);
+  const f=flower([0x5aa9ff,0x2f7be0,0x8fcaff,0x3d63d8][i%4]);
   f.position.copy(tp);
   f.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),new THREE.Vector3(tp.x,1.1,tp.z).normalize());
-  f.scale.setScalar(.85+Math.random()*.3);
+  f.scale.setScalar(.7+Math.random()*.25);
   bouquet.add(f); flowers.push(f);
 }
 /* hojas */
@@ -229,7 +244,8 @@ cv.addEventListener('pointerup',e=>{
   state.drag=false;
   if(state.moved>6)return;
   mouse.set(e.clientX/W()*2-1,-(e.clientY/H())*2+1); ray.setFromCamera(mouse,camera);
-  if(!state.open){ if(ray.intersectObject(box,true).length) openBox(); }  else if(ray.intersectObject(card).length) openLetter();
+  if(!state.open){ if(ray.intersectObject(box,true).length) openBox(); }
+  else if(ray.intersectObject(card).length) openLetter();
 });
 
 /* tweens */
@@ -239,7 +255,7 @@ function tween(dur,delay,fn,ez=ease.out,done){tweens.push({dur,delay,fn,ez,done,
 
 function openBox(){
   state.open=true;
-  document.getElementById('hint').style.opacity=0;
+  const hintEl=document.getElementById('hint');hintEl.style.animation='none';hintEl.style.opacity=0;
   tween(.6,0,k=>{lock.scale.setScalar(1.6*(1-k));lock.position.y=1.15+k*.5;lock.rotation.z=k*1.5;},ease.out,()=>lock.visible=false);
   tween(1.6,.4,k=>{lidPivot.rotation.x=-1.95*k;},ease.back);
   sparks.visible=true; pl.intensity=2.6;
@@ -247,7 +263,7 @@ function openBox(){
   bouquet.visible=true;
   tween(2.4,1.1,k=>{bouquet.scale.setScalar(.01+k*.99);bouquet.position.y=.9+k*.9;},ease.back);
   tween(1.8,1.4,k=>{cam.d=baseDist()*(1-.12*k);cam.ty=1.6+k*1.0;cam.cy=3+k*.6;});
-  setTimeout(()=>{document.getElementById('title').classList.add('on');document.getElementById('hint').textContent='Toca la tarjetita 💌';document.getElementById('hint').style.opacity=.9;},2800);
+  setTimeout(()=>{document.getElementById('title').classList.add('on');hintEl.textContent='Toca la tarjetita 💌';hintEl.style.animation='';hintEl.style.opacity='';},2800);
 }
 let typer=null;
 function openLetter(){
